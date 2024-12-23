@@ -70,5 +70,9 @@ const addProduct = async (req, res) => {
             });
         });
 }
-
-export { getAllProduct, deleteAllProduct, getProductById, addProduct }
+const deleteProductbyId = async (req, res) => {
+    Product.deleteOne({ _id: req.params.id }).then(() => {
+        res.json({ Message: "product deleted successfully!!" })
+    })
+}
+export { getAllProduct, deleteAllProduct, getProductById, addProduct, deleteProductbyId }
