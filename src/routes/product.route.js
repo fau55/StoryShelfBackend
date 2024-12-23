@@ -5,7 +5,7 @@ const router = Router();
 
 router.route('/get-all').get(getAllProduct);
 router.route('/delete-all').get(deleteAllProduct);
-router.route('/get/by/:id').post(getProductById);
+router.route('/get/by/:id').get(getProductById);
 router.route('/create').post(addProduct);
 
 export default router;
