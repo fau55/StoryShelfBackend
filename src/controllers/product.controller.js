@@ -31,45 +31,74 @@ const getProductById = async (req, res) => {
 }
 
 const addProduct = async (req, res) => {
-    const { productName, productDescription, productPrice, category, stock, tags, productImages } = req.body;
-
-    // Validate the number of images
-    if (productImages && productImages.length > 4) {
-        return res.status(400).json({
-            error: 'You can upload a maximum of 4 images.',
-        });
-    }
-
-
-    // Create a new product instance
-    const newProduct = new Product({
+    try {
+      const {
         productName,
         productDescription,
         productPrice,
         category,
+        authorName,
         stock,
         tags,
         productImages,
-        createdAt: new Date(),
-    });
-
-
-    // Save the product
-    newProduct
-        .save()
-        .then((product) => {
-            res.status(201).json({
-                message: 'Product created successfully',
-                product,
-            });
-        })
-        .catch((error) => {
-            console.error('Error creating product:', error);
-            res.status(500).json({
-                error: 'Failed to create product',
-            });
+      } = req.body;
+  
+      // Validate required fields
+      if (
+        !productName ||
+        !productDescription ||
+        productPrice === undefined ||
+        !category ||
+        stock === undefined
+      ) {
+        return res.status(400).json({
+          error: 'All required fields (productName, productDescription, productPrice, category, stock) must be provided.',
         });
-}
+      }
+  
+      // Validate the number of images
+      if (productImages && productImages.length > 4) {
+        return res.status(400).json({
+          error: 'You can upload a maximum of 4 images.',
+        });
+      }
+  
+      // Validate tags
+      if (tags && !Array.isArray(tags)) {
+        return res.status(400).json({
+          error: 'Tags must be an array.',
+        });
+      }
+  
+      // Create a new product instance
+      const newProduct = new Product({
+        productName,
+        productDescription,
+        productPrice,
+        category,
+        authorName,
+        stock,
+        tags: tags || [], // Default to an empty array if tags are not provided
+        productImages: productImages || [], // Default to an empty array if productImages are not provided
+        createdAt: new Date(),
+      });
+  
+      // Save the product to the database
+      const savedProduct = await newProduct.save();
+  
+      // Send a success response
+      res.status(201).json({
+        message: 'Product created successfully',
+        product: savedProduct,
+      });
+    } catch (error) {
+      console.error('Error creating product:', error);
+      res.status(500).json({
+        error: 'Failed to create product. Please try again later.',
+      });
+    }
+  };
+  
 const deleteProductbyId = async (req, res) => {
     Product.deleteOne({ _id: req.params.id }).then(() => {
         res.json({ Message: "product deleted successfully!!" })

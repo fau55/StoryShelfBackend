@@ -8,6 +8,11 @@ const productSchema = new Schema({
     required: true,
     trim: true
   },
+  authorName: {
+    type: String,
+    required: true,
+    trim: true
+  },
   productDescription: {
     type: String,
     required: true,
