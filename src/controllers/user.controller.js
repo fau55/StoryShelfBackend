@@ -51,8 +51,7 @@ const register = async (req, res) => {
             phone,
             email,
             password,
-            gender,
-            role: 'buyer'
+            gender
         });
 
         const savedUser = await user.save();
