@@ -1,6 +1,6 @@
 import { User } from '../models/user.js'
 import { Cart } from '../models/cart.js'
-import bcrypt from 'bcrypt';
+
 
 const getAllUsers = async (req, res) => {
 
@@ -43,8 +43,6 @@ const register = async (req, res) => {
             return res.status(400).json({ message: 'Email is already in use' });
         }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create and save the user
         const user = new User({
@@ -52,7 +50,7 @@ const register = async (req, res) => {
             lastName,
             phone,
             email,
-            password: hashedPassword,
+            password,
             gender,
             role: 'buyer'
         });
