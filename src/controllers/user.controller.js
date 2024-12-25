@@ -140,4 +140,9 @@ const uploadUserProfile = async (req, res) => {
     }
 }
 
-export { getAllUsers, getUserById, register, login, uploadUserProfile }
+const deleteAll = async (req,res) =>{
+    User.deleteMany().then(()=>{
+        res.status(400).json({Message : 'Deleted All the user Successfully!!'})
+    })
+}
+export { getAllUsers, getUserById, register, login, uploadUserProfile, deleteAll }
