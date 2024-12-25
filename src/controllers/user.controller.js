@@ -1,5 +1,6 @@
 import { User } from '../models/user.js'
 import { Cart } from '../models/cart.js'
+import bcrypt from 'bcrypt';
 
 const getAllUsers = async (req, res) => {
 
@@ -34,37 +35,55 @@ const getUserById = async (req, res) => {
 
 const register = async (req, res) => {
     try {
-        // Create a new user instance from the request body
-        const userToAdd = new User({ ...req.body });
+        const { firstName, lastName, phone, email, password, gender } = req.body;
 
-        // Save the user to the database
-        const user = await userToAdd.save();
-
-        // Check if the user was created successfully
-        if (!user) {
-            return res.status(500).json({ message: "User registration failed" });
+        // Check if email already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Email is already in use' });
         }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create and save the user
+        const user = new User({
+            firstName,
+            lastName,
+            phone,
+            email,
+            password: hashedPassword,
+            gender,
+            role: 'buyer'
+        });
+
+        const savedUser = await user.save();
 
         // Create a new cart for the user
         const newCart = new Cart({
-            userId: user._id,
-            totalPrice: 0
+            userId: savedUser._id,
+            totalPrice: 0,
         });
         await newCart.save();
 
         // Respond with success
         return res.status(201).json({
-            message: "Registered successfully!",
-            user,
+            message: 'Registered successfully!',
+            user: {
+                id: savedUser._id,
+                firstName: savedUser.firstName,
+                lastName: savedUser.lastName,
+                email: savedUser.email,
+                role: savedUser.role,
+            },
         });
     } catch (err) {
-        // Handle errors and send a response
-        console.error(err);
-        return res.status(400).json({
-            error: err.message || "An error occurred during registration",
+        console.error('Error during registration:', err);
+        return res.status(500).json({
+            error: err.message || 'An error occurred during registration',
         });
     }
-}
+};
 
 const login = async (req, res) => {
     User.findOne({ email: req.body.email })
