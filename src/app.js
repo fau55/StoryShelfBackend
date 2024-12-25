@@ -1,6 +1,7 @@
 // Importing required modules
 import bodyParser from 'body-parser'
 import express from "express";
+import cors from "cors";
 import "dotenv/config";
 // routes
 import cartRouter from "./routes/cart.route.js";
@@ -10,6 +11,13 @@ import userRouter from "./routes/user.route.js";
 const app = express();
 
 // cors issue
+
+// Enable CORS with specific options
+app.use(cors({
+  origin: "*", // Or specify allowed origins: ["http://example.com"]
+  methods: "GET, POST, PUT, DELETE, OPTIONS",
+  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use((req, res, next) => {
